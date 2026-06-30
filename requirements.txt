@@ -1,0 +1,3 @@
+# DistrictIntel currently has no external runtime dependencies.
+# Runtime and development tooling are declared in pyproject.toml.
+# For development, install with: python -m pip install -e ".[dev]"
