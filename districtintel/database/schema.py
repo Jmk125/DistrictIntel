@@ -99,6 +99,39 @@ SCHEMA_STATEMENTS = (
     CREATE INDEX IF NOT EXISTS idx_evidence_research_job_id
     ON evidence (research_job_id);
     """,
+
+    """
+    CREATE TABLE IF NOT EXISTS facts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        school_id INTEGER NOT NULL,
+        fact_type TEXT NOT NULL,
+        value TEXT NOT NULL,
+        value_type TEXT NOT NULL,
+        confidence_level TEXT NOT NULL,
+        status TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+    );
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS fact_evidence (
+        fact_id INTEGER NOT NULL,
+        evidence_id INTEGER NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (fact_id, evidence_id),
+        FOREIGN KEY (fact_id) REFERENCES facts(id) ON DELETE CASCADE,
+        FOREIGN KEY (evidence_id) REFERENCES evidence(id) ON DELETE CASCADE
+    );
+    """,
+    """
+    CREATE INDEX IF NOT EXISTS idx_facts_school_id
+    ON facts (school_id);
+    """,
+    """
+    CREATE INDEX IF NOT EXISTS idx_fact_evidence_evidence_id
+    ON fact_evidence (evidence_id);
+    """,
     """
     CREATE INDEX IF NOT EXISTS idx_research_results_school_id
     ON research_results (school_id);

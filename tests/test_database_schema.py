@@ -27,4 +27,6 @@ def test_research_schema_tables_are_created(tmp_path: Path) -> None:
         "sources",
         "evidence",
         "research_results",
+        "facts",
+        "fact_evidence",
     }.issubset(tables)
