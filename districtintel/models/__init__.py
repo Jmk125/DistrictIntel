@@ -2,6 +2,7 @@
 
 from districtintel.models.district import District
 from districtintel.models.fact import Fact, FactStatus, FactType, FactValueType
+from districtintel.models.provider import ProviderContext, ProviderResult
 from districtintel.models.research import (
     ConfidenceLevel,
     Evidence,
@@ -21,6 +22,8 @@ __all__ = [
     "FactStatus",
     "FactType",
     "FactValueType",
+    "ProviderContext",
+    "ProviderResult",
     "ResearchJob",
     "ResearchResult",
     "ResearchStatus",

@@ -5,6 +5,7 @@ from __future__ import annotations
 from districtintel.models import (
     ConfidenceLevel,
     Evidence,
+    ProviderContext,
     ResearchResult,
     ResearchStatus,
     School,
@@ -18,7 +19,11 @@ class FakeProvider:
 
     name = "fake-provider"
 
-    def collect_evidence(self, school: School) -> tuple[Evidence, ...]:
+    def collect_evidence(
+        self,
+        school: School,
+        context: ProviderContext,
+    ) -> tuple[Evidence, ...]:
         return (
             Evidence(
                 source=Source(title=f"{school.name} source"),

@@ -5,15 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from districtintel.models import Evidence, ResearchResult, School
-
-
-class SourceProvider(Protocol):
-    """Collects evidence for a school without deciding the final result."""
-
-    name: str
-
-    def collect_evidence(self, school: School) -> tuple[Evidence, ...]:
-        """Collect candidate evidence for a school."""
+from districtintel.providers.interfaces import SourceProvider
 
 
 class ResearchAgent(Protocol):
@@ -23,3 +15,6 @@ class ResearchAgent(Protocol):
 
     def research(self, school: School, evidence: tuple[Evidence, ...]) -> ResearchResult:
         """Research a school using already-collected evidence."""
+
+
+__all__ = ["ResearchAgent", "SourceProvider"]

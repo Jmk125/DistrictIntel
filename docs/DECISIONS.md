@@ -219,3 +219,37 @@ Positive:
 
 Negative:
 - The source vocabulary may need expansion once real providers are implemented.
+
+
+---
+
+# ADR-0007
+
+Date:
+2026-06-30
+
+Status:
+Accepted
+
+Decision:
+Introduce a source provider framework with ordered registration and failure-isolated coordination.
+
+Context:
+Milestone 6 needs the architecture future source providers will plug into, without implementing web requests, scraping, AI calls, persistence, or fact creation.
+
+Alternatives Considered:
+- Let research agents call source-specific code directly
+- Persist evidence directly inside providers
+- Add a provider registry and coordinator that only aggregate Evidence objects
+
+Chosen Solution:
+Define SourceProvider as a protocol that accepts a School and ProviderContext and returns Evidence objects. Use ProviderRegistry for ordered provider registration and ProviderCoordinator to execute providers, isolate failures, and aggregate evidence without persistence.
+
+Consequences:
+Positive:
+- Future providers can be added without changing research agents.
+- Provider failures do not prevent later providers from producing evidence.
+- Providers remain side-effect-light and do not create facts, call AI, or persist data.
+
+Negative:
+- Placeholder providers intentionally return no evidence until real source collection is designed.

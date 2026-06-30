@@ -4,8 +4,16 @@ from __future__ import annotations
 
 import logging
 
-from districtintel.models import ConfidenceLevel, Evidence, ResearchResult, ResearchStatus, School
-from districtintel.research.interfaces import ResearchAgent, SourceProvider
+from districtintel.models import (
+    ConfidenceLevel,
+    Evidence,
+    ProviderContext,
+    ResearchResult,
+    ResearchStatus,
+    School,
+)
+from districtintel.providers import ProviderCoordinator, SourceProvider
+from districtintel.research.interfaces import ResearchAgent
 
 LOGGER = logging.getLogger(__name__)
 
@@ -47,8 +55,5 @@ class ResearchCoordinator:
         return result
 
     def _collect_evidence(self, school: School) -> tuple[Evidence, ...]:
-        collected: list[Evidence] = []
-        for provider in self._source_providers:
-            LOGGER.info("Collecting evidence provider=%s school_id=%s", provider.name, school.id)
-            collected.extend(provider.collect_evidence(school))
-        return tuple(collected)
+        provider_coordinator = ProviderCoordinator(providers=self._source_providers)
+        return provider_coordinator.collect_evidence(school, ProviderContext())
