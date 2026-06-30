@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from districtintel.providers.capabilities import ProviderCapability
 from districtintel.providers.interfaces import SourceProvider
 
 
@@ -31,8 +32,22 @@ class ProviderRegistry:
     def providers(self) -> tuple[SourceProvider, ...]:
         """Return providers in execution order."""
 
-        ordered = sorted(self._providers, key=lambda registered: registered.order)
-        return tuple(registered.provider for registered in ordered)
+        return tuple(registered.provider for registered in self._ordered_providers())
+
+    def providers_for(
+        self,
+        capability: ProviderCapability,
+    ) -> tuple[SourceProvider, ...]:
+        """Return ordered providers that advertise a capability."""
+
+        return tuple(
+            registered.provider
+            for registered in self._ordered_providers()
+            if capability in registered.provider.capabilities
+        )
+
+    def _ordered_providers(self) -> tuple[RegisteredProvider, ...]:
+        return tuple(sorted(self._providers, key=lambda registered: registered.order))
 
 
 def register_provider(

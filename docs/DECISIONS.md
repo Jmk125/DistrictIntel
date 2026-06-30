@@ -253,3 +253,71 @@ Positive:
 
 Negative:
 - Placeholder providers intentionally return no evidence until real source collection is designed.
+
+
+---
+
+# ADR-0008
+
+Date:
+2026-06-30
+
+Status:
+Accepted
+
+Decision:
+Use provider capabilities to select source providers for targeted evidence collection.
+
+Context:
+Milestone 7 needs to prevent every source provider from running for every research task, while still avoiding real web requests, AI, scraping, persistence, or source-specific logic.
+
+Alternatives Considered:
+- Let research agents know provider names directly
+- Keep running every provider for every task
+- Add a ProviderCapability enum advertised by providers and queried by coordinators
+
+Chosen Solution:
+Define ProviderCapability as an enum describing what information a provider can collect. Providers expose immutable capability tuples, ProviderRegistry can return ordered providers for a capability, and ProviderCoordinator can collect evidence only from matching providers.
+
+Consequences:
+Positive:
+- Research agents can request evidence by information need rather than provider name.
+- Provider ordering and failure isolation continue to work for targeted collection.
+- No database, persistence, network, scraping, or AI behavior is introduced.
+
+Negative:
+- Capability assignments are initial placeholders and will need refinement when real providers are designed.
+
+
+---
+
+# ADR-0009
+
+Date:
+2026-06-30
+
+Status:
+Accepted
+
+Decision:
+Add a small standard-library WebClient that returns normalized FetchResult objects.
+
+Context:
+Milestone 8 needs a reusable fetch layer future source providers can use, but must not implement real providers, scraping, parsing, AI, persistence, or business logic.
+
+Alternatives Considered:
+- Let each provider make HTTP requests directly
+- Add requests or httpx now
+- Use urllib from the Python standard library behind a small wrapper
+
+Chosen Solution:
+Use urllib.request through a WebClient wrapper with a simple user-agent, timeout handling, redirect final URL reporting, common request error handling, and an in-memory per-client cache. Return FetchResult instead of raw HTTP responses.
+
+Consequences:
+Positive:
+- Keeps dependencies minimal while provider behavior is still architectural.
+- Gives future providers one safe fetching boundary.
+- Avoids repeated network calls for the same URL during one run.
+
+Negative:
+- urllib is lower-level than httpx or requests, so future advanced HTTP needs may justify adding a dependency later.

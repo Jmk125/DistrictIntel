@@ -3,14 +3,25 @@
 from __future__ import annotations
 
 from districtintel.models import Evidence, ProviderContext, School, Source
-from districtintel.providers import ProviderCoordinator, ProviderRegistry, register_provider
+from districtintel.providers import (
+    ProviderCapability,
+    ProviderCoordinator,
+    ProviderRegistry,
+    register_provider,
+)
 
 
 class NamedProvider:
     """Test provider that returns one evidence item."""
 
-    def __init__(self, name: str, excerpt: str) -> None:
+    def __init__(
+        self,
+        name: str,
+        excerpt: str,
+        capabilities: tuple[ProviderCapability, ...] = (ProviderCapability.YEAR_BUILT,),
+    ) -> None:
         self.name = name
+        self.capabilities = capabilities
         self._excerpt = excerpt
 
     def collect_evidence(
@@ -30,6 +41,7 @@ class FailingProvider:
     """Test provider that fails deterministically."""
 
     name = "failing-provider"
+    capabilities = (ProviderCapability.YEAR_BUILT,)
 
     def collect_evidence(
         self,
@@ -131,3 +143,115 @@ def test_provider_failure_is_isolated() -> None:
         "Example School: before evidence",
         "Example School: after evidence",
     ]
+
+
+def test_registry_filters_providers_by_capability() -> None:
+    """Registry lookup returns only providers advertising the requested capability."""
+
+    registry = ProviderRegistry()
+    year_built = NamedProvider(
+        "year-built",
+        "year built evidence",
+        capabilities=(ProviderCapability.YEAR_BUILT,),
+    )
+    news = NamedProvider(
+        "news",
+        "news evidence",
+        capabilities=(ProviderCapability.NEWS,),
+    )
+    both = NamedProvider(
+        "both",
+        "combined evidence",
+        capabilities=(ProviderCapability.YEAR_BUILT, ProviderCapability.NEWS),
+    )
+    registry.register(news, order=30)
+    registry.register(both, order=20)
+    registry.register(year_built, order=10)
+
+    assert registry.providers_for(ProviderCapability.YEAR_BUILT) == (year_built, both)
+    assert registry.providers_for(ProviderCapability.NEWS) == (both, news)
+
+
+def test_coordinator_collects_evidence_for_matching_capability_only() -> None:
+    """Capability-scoped collection only executes matching providers."""
+
+    school = School(id=1, district_id=1, name="Example School")
+    coordinator = ProviderCoordinator(
+        providers=(
+            NamedProvider(
+                "year-built",
+                "year built evidence",
+                capabilities=(ProviderCapability.YEAR_BUILT,),
+            ),
+            NamedProvider(
+                "news",
+                "news evidence",
+                capabilities=(ProviderCapability.NEWS,),
+            ),
+        )
+    )
+
+    evidence = coordinator.collect_evidence_for(
+        school,
+        ProviderCapability.NEWS,
+        ProviderContext(),
+    )
+
+    assert [item.excerpt for item in evidence] == ["Example School: news evidence"]
+
+
+def test_capability_filtered_failure_is_isolated() -> None:
+    """A failing matching provider does not block later matching providers."""
+
+    school = School(id=1, district_id=1, name="Example School")
+    coordinator = ProviderCoordinator(
+        providers=(
+            NamedProvider(
+                "non-matching",
+                "non-matching evidence",
+                capabilities=(ProviderCapability.NEWS,),
+            ),
+            FailingProvider(),
+            NamedProvider(
+                "matching",
+                "matching evidence",
+                capabilities=(ProviderCapability.YEAR_BUILT,),
+            ),
+        )
+    )
+
+    evidence = coordinator.collect_evidence_for(
+        school,
+        ProviderCapability.YEAR_BUILT,
+        ProviderContext(),
+    )
+
+    assert [item.excerpt for item in evidence] == ["Example School: matching evidence"]
+
+
+def test_placeholder_providers_advertise_expected_capabilities() -> None:
+    """Placeholder providers advertise initial capability mappings only."""
+
+    from districtintel.providers import (  # noqa: PLC0415
+        BoardMinutesProvider,
+        CountyAuditorProvider,
+        DistrictWebsiteProvider,
+        LocalNewsProvider,
+        OfccProvider,
+    )
+
+    assert CountyAuditorProvider.capabilities == (
+        ProviderCapability.YEAR_BUILT,
+        ProviderCapability.SQUARE_FOOTAGE,
+    )
+    assert DistrictWebsiteProvider.capabilities == (
+        ProviderCapability.CONTACT_INFORMATION,
+        ProviderCapability.ARCHITECT,
+    )
+    assert BoardMinutesProvider.capabilities == (
+        ProviderCapability.BOARD_DISCUSSIONS,
+        ProviderCapability.BOND_HISTORY,
+        ProviderCapability.LEVY_HISTORY,
+    )
+    assert LocalNewsProvider.capabilities == (ProviderCapability.NEWS,)
+    assert OfccProvider.capabilities == (ProviderCapability.OFCC_INFORMATION,)
