@@ -321,3 +321,39 @@ Positive:
 
 Negative:
 - urllib is lower-level than httpx or requests, so future advanced HTTP needs may justify adding a dependency later.
+
+
+---
+
+# ADR-0010
+
+Date:
+2026-06-30
+
+Status:
+Accepted
+
+Decision:
+Use Mahoning County Auditor as the first real county auditor provider spike.
+
+Context:
+Milestone 9 needs one real source provider spike for one Ohio county while avoiding AI, facts, scoring, persistence, broad county coverage, and over-engineered parsing. Mahoning County was preferred, and its public Auditor search page exposes property search and residential criteria including Year Built and Living Area fields.
+
+Alternatives Considered:
+- Build providers for multiple counties
+- Use a private or JavaScript-heavy property data source
+- Build a Mahoning-only provider spike that fetches public auditor pages through WebClient
+
+Chosen Solution:
+Create MahoningCountyAuditorProvider as a SourceProvider-compatible class advertising YEAR_BUILT and SQUARE_FOOTAGE. It builds a simple Mahoning Auditor search URL from a school address, fetches through WebClient, extracts a short text excerpt when property details are present, and returns Evidence only.
+
+Consequences:
+Positive:
+- Exercises the real provider architecture with one public county source.
+- Keeps network access isolated behind WebClient.
+- Preserves evidence-first behavior without creating facts or conclusions.
+
+Negative:
+- Search URL and parsing are intentionally minimal and may need refinement after testing against real parcel pages.
+- The provider does not bypass JavaScript, CAPTCHA, session-heavy search flows, or access controls.
+- The spike does not determine final year-built or square-footage facts.

@@ -3,6 +3,7 @@
 from districtintel.providers.capabilities import ProviderCapability
 from districtintel.providers.coordinator import ProviderCoordinator
 from districtintel.providers.interfaces import SourceProvider
+from districtintel.providers.mahoning_auditor import MahoningCountyAuditorProvider
 from districtintel.providers.placeholders import (
     BoardMinutesProvider,
     CountyAuditorProvider,
@@ -17,6 +18,7 @@ __all__ = [
     "CountyAuditorProvider",
     "DistrictWebsiteProvider",
     "LocalNewsProvider",
+    "MahoningCountyAuditorProvider",
     "OfccProvider",
     "ProviderCapability",
     "ProviderCoordinator",
