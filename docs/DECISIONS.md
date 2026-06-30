@@ -82,3 +82,35 @@ Build independent research agents around a shared Research Engine.
 Reason:
 Keeps business logic reusable and allows new research capabilities without
 rewriting the application.
+
+---
+
+# ADR-0003
+
+Date:
+2026-06-30
+
+Status:
+Accepted
+
+Decision:
+Use dataclass domain models with a small repository layer over SQLite for foundational district and school persistence.
+
+Context:
+Milestone 2 needs durable district and school storage plus CSV import without introducing research, AI, or business logic.
+
+Alternatives Considered:
+- Direct SQL calls from CLI and import services
+- Full ORM such as SQLAlchemy
+
+Chosen Solution:
+Represent District and School as typed dataclasses, keep SQL isolated in repository classes, and coordinate CSV import through a service layer.
+
+Consequences:
+Positive:
+- Keeps CLI, import orchestration, domain models, and SQL persistence separated.
+- Avoids new runtime dependencies while the schema is small.
+- Leaves room to introduce migrations or an ORM later if the data layer grows.
+
+Negative:
+- Repositories contain explicit SQL that must be maintained as schema changes.

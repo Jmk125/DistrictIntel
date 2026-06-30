@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "districtintel"
+version = "0.1.0"
+description = "AI-powered research platform for Ohio K-12 school district facility intelligence."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+authors = [
+  { name = "DistrictIntel Team" }
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "ruff>=0.5.0",
+]
+
+[project.scripts]
+districtintel = "districtintel.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["districtintel"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["districtintel", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "ANN", "SIM"]
