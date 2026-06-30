@@ -186,3 +186,36 @@ Positive:
 Negative:
 - The initial controlled vocabulary will need to evolve as real research agents are designed.
 - Repositories still use explicit SQL until a migration strategy or ORM is justified.
+
+---
+
+# ADR-0006
+
+Date:
+2026-06-30
+
+Status:
+Accepted
+
+Decision:
+Standardize source categories with SourceType and keep evidence persistence in EvidenceRepository.
+
+Context:
+Milestone 5 needs stronger source and evidence persistence before real source providers or research agents are added. Earlier research models left source_type as a loose string.
+
+Alternatives Considered:
+- Continue accepting arbitrary source_type strings
+- Create dedicated source-provider tables before providers exist
+- Add a SourceType enum and a focused EvidenceRepository
+
+Chosen Solution:
+Use a SourceType enum for controlled source categories, default unknown categories to other, and centralize source/evidence creation and lookup in EvidenceRepository. Keep FactRepository focused on facts and fact-to-evidence links.
+
+Consequences:
+Positive:
+- Makes future source-provider output consistent and queryable.
+- Keeps evidence persistence separate from fact persistence.
+- Avoids schema churn beyond indexes and tables needed for existing concepts.
+
+Negative:
+- The source vocabulary may need expansion once real providers are implemented.

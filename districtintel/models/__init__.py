@@ -9,6 +9,7 @@ from districtintel.models.research import (
     ResearchResult,
     ResearchStatus,
     Source,
+    SourceType,
 )
 from districtintel.models.school import School
 
@@ -25,4 +26,5 @@ __all__ = [
     "ResearchStatus",
     "School",
     "Source",
+    "SourceType",
 ]

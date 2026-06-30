@@ -99,7 +99,10 @@ SCHEMA_STATEMENTS = (
     CREATE INDEX IF NOT EXISTS idx_evidence_research_job_id
     ON evidence (research_job_id);
     """,
-
+    """
+    CREATE INDEX IF NOT EXISTS idx_evidence_source_id
+    ON evidence (source_id);
+    """,
     """
     CREATE TABLE IF NOT EXISTS facts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

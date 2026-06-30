@@ -29,17 +29,27 @@ class ResearchStatus(StrEnum):
     FAILED = "failed"
 
 
+class SourceType(StrEnum):
+    """Controlled vocabulary for source categories."""
+
+    COUNTY_AUDITOR = "county_auditor"
+    OFCC = "ofcc"
+    DISTRICT_FACILITY_PLAN = "district_facility_plan"
+    DISTRICT_WEBSITE = "district_website"
+    BOARD_MINUTES = "board_minutes"
+    ARCHITECT_DOCUMENT = "architect_document"
+    GOVERNMENT_PUBLICATION = "government_publication"
+    LOCAL_NEWS = "local_news"
+    OTHER = "other"
+
+
 @dataclass(frozen=True, slots=True)
 class Source:
     """A source that may support research evidence."""
 
     title: str
     url: str | None = None
-    # TODO: Standardize source_type as a controlled vocabulary or enum.
-    # Expected future values may include county_auditor, ofcc, district_facility_plan,
-    # district_website, board_minutes, architect_document, government_publication,
-    # and local_news.
-    source_type: str | None = None
+    source_type: SourceType = SourceType.OTHER
     published_at: datetime | None = None
     accessed_at: datetime | None = None
     id: int | None = None

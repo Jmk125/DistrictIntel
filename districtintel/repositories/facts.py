@@ -15,12 +15,7 @@ class FactRepository:
         self._connection = connection
 
     def create(self, fact: Fact) -> Fact:
-        """Create a structured fact row.
-
-        At least one persisted Evidence object is required so facts are never
-        stored without traceability. Additional evidence can be linked later with
-        ``link_evidence``.
-        """
+        """Create a structured fact row with required evidence links."""
 
         _validate_fact(fact)
         cursor = self._connection.execute(
@@ -46,20 +41,20 @@ class FactRepository:
             value=fact.value,
             value_type=fact.value_type,
             confidence=fact.confidence,
-            status=fact.status,
             evidence=fact.evidence,
+            status=fact.status,
         )
         for evidence in fact.evidence:
-            if evidence.id is None:
-                raise ValueError("Fact evidence must have an id before linking.")
             self.link_evidence(created.id, evidence.id)
         return created
 
-    def link_evidence(self, fact_id: int | None, evidence_id: int) -> None:
+    def link_evidence(self, fact_id: int | None, evidence_id: int | None) -> None:
         """Link a fact to an evidence row."""
 
         if fact_id is None:
             raise ValueError("fact_id is required to link evidence.")
+        if evidence_id is None:
+            raise ValueError("evidence_id is required to link evidence.")
         self._connection.execute(
             """
             INSERT OR IGNORE INTO fact_evidence (fact_id, evidence_id)
@@ -69,12 +64,7 @@ class FactRepository:
         )
 
     def list_for_school(self, school_id: int) -> list[Fact]:
-        """Return structured facts for a school.
-
-        This method returns fact records and keeps evidence traceability queryable
-        through ``fact_evidence``. Loading full Evidence objects belongs in a future
-        evidence repository once evidence persistence grows beyond schema prep.
-        """
+        """Return structured facts for a school."""
 
         rows = self._connection.execute(
             """
