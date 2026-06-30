@@ -110,6 +110,7 @@ class ResearchResultRepository:
             confidence=result.confidence,
             summary=result.summary,
             evidence=result.evidence,
+            facts=result.facts,
             error_message=result.error_message,
         )
 

@@ -5,6 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from districtintel.models.fact import Fact
 
 
 class ConfidenceLevel(StrEnum):
@@ -68,10 +72,10 @@ class ResearchJob:
 class ResearchResult:
     """Structured output from a research agent.
 
-    TODO: Introduce a structured Fact/Finding model before implementing real
-    research agents. Future results should emit validated facts such as
-    year_built, renovation_year, bond_issue, architect, and facility_condition,
-    each tied to evidence and confidence.
+    Research agents should use the structured Fact model for queryable claims
+    such as year_built, renovation_year, bond_issue, architect, and
+    facility_condition. Summaries remain supplemental and should not replace
+    evidence-backed facts when a structured value is possible.
     """
 
     school_id: int
@@ -80,6 +84,7 @@ class ResearchResult:
     confidence: ConfidenceLevel = ConfidenceLevel.UNKNOWN
     summary: str | None = None
     evidence: tuple[Evidence, ...] = field(default_factory=tuple)
+    facts: tuple[Fact, ...] = field(default_factory=tuple)
     job_id: int | None = None
     id: int | None = None
     error_message: str | None = None

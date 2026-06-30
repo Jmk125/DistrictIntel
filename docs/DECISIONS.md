@@ -151,3 +151,38 @@ Negative:
 Design Notes:
 - Future research results should introduce a structured Fact or Finding concept before real agents are implemented. Expected examples include year_built, renovation_year, bond_issue, architect, and facility_condition.
 - Source types should be standardized as an enum or controlled vocabulary before source collection providers are added.
+
+
+---
+
+# ADR-0005
+
+Date:
+2026-06-30
+
+Status:
+Accepted
+
+Decision:
+Use a structured Fact model for evidence-backed, queryable school intelligence.
+
+Context:
+Milestone 4 needs future research agents to store claims such as year built, renovation year, bond issues, architects, facility condition, and average building age without implementing real research behavior.
+
+Alternatives Considered:
+- Store findings as free-text summaries only
+- Use a loosely typed JSON blob for all research output
+- Introduce a structured Fact model with typed values and evidence links
+
+Chosen Solution:
+Represent queryable intelligence as school-scoped Fact records with a controlled fact type, declared value type, confidence level, validation status, and many-to-many links to evidence rows. ResearchResult can carry structured facts alongside summaries and evidence.
+
+Consequences:
+Positive:
+- Keeps every stored fact traceable to evidence.
+- Enables future querying and reporting over structured values.
+- Preserves minimal dependencies and the existing repository pattern.
+
+Negative:
+- The initial controlled vocabulary will need to evolve as real research agents are designed.
+- Repositories still use explicit SQL until a migration strategy or ORM is justified.
