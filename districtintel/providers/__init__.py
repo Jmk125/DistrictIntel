@@ -1,5 +1,6 @@
 """Source provider framework."""
 
+from districtintel.providers.capabilities import ProviderCapability
 from districtintel.providers.coordinator import ProviderCoordinator
 from districtintel.providers.interfaces import SourceProvider
 from districtintel.providers.placeholders import (
@@ -17,6 +18,7 @@ __all__ = [
     "DistrictWebsiteProvider",
     "LocalNewsProvider",
     "OfccProvider",
+    "ProviderCapability",
     "ProviderCoordinator",
     "ProviderRegistry",
     "SourceProvider",

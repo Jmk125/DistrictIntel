@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 from districtintel.models import Evidence, ProviderContext, ProviderResult, School
+from districtintel.providers.capabilities import ProviderCapability
 from districtintel.providers.interfaces import SourceProvider
 from districtintel.providers.registry import ProviderRegistry
 
@@ -58,7 +59,30 @@ class ProviderCoordinator:
     ) -> tuple[Evidence, ...]:
         """Run providers and return the aggregate successful evidence."""
 
+        return self._collect_successful_evidence(self.run(school=school, context=context))
+
+    def collect_evidence_for(
+        self,
+        school: School,
+        capability: ProviderCapability,
+        context: ProviderContext | None = None,
+    ) -> tuple[Evidence, ...]:
+        """Run providers advertising a capability and aggregate evidence."""
+
+        matching_providers = tuple(
+            provider for provider in self._providers if capability in provider.capabilities
+        )
+        results = ProviderCoordinator(providers=matching_providers).run(
+            school=school,
+            context=context,
+        )
+        return self._collect_successful_evidence(results)
+
+    def _collect_successful_evidence(
+        self,
+        results: tuple[ProviderResult, ...],
+    ) -> tuple[Evidence, ...]:
         evidence: list[Evidence] = []
-        for result in self.run(school=school, context=context):
+        for result in results:
             evidence.extend(result.evidence)
         return tuple(evidence)

@@ -253,3 +253,37 @@ Positive:
 
 Negative:
 - Placeholder providers intentionally return no evidence until real source collection is designed.
+
+
+---
+
+# ADR-0008
+
+Date:
+2026-06-30
+
+Status:
+Accepted
+
+Decision:
+Use provider capabilities to select source providers for targeted evidence collection.
+
+Context:
+Milestone 7 needs to prevent every source provider from running for every research task, while still avoiding real web requests, AI, scraping, persistence, or source-specific logic.
+
+Alternatives Considered:
+- Let research agents know provider names directly
+- Keep running every provider for every task
+- Add a ProviderCapability enum advertised by providers and queried by coordinators
+
+Chosen Solution:
+Define ProviderCapability as an enum describing what information a provider can collect. Providers expose immutable capability tuples, ProviderRegistry can return ordered providers for a capability, and ProviderCoordinator can collect evidence only from matching providers.
+
+Consequences:
+Positive:
+- Research agents can request evidence by information need rather than provider name.
+- Provider ordering and failure isolation continue to work for targeted collection.
+- No database, persistence, network, scraping, or AI behavior is introduced.
+
+Negative:
+- Capability assignments are initial placeholders and will need refinement when real providers are designed.
